@@ -29,7 +29,7 @@ func rss(c echo.Context) error {
 		return c.String(http.StatusOK, "error")
 	} else {
 		for idx, item := range feed.Items {
-			if idx > 2 {
+			if idx > 0 {
 				break
 			}
 			feeds = append(feeds, model.Feed{
