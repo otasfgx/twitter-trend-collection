@@ -5,18 +5,35 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"rss/infrastructure/application/basic"
+	"rss/infrastructure/datasource/trends"
 	"rss/model"
+	"rss/usecase"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
 	"github.com/mmcdole/gofeed"
 )
 
 const GOOGLE_NEWS_RSS_URL = "https://news.google.com/rss/search"
 
+func init() {
+	if err := godotenv.Load(); err != nil {
+		panic(fmt.Errorf("failed to load .env file: %w", err))
+	}
+}
+
 func main() {
-	e := echo.New()
-	e.POST("/", rss)
-	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
+	var (
+		TWITTER_API_KEY       = os.Getenv("TWITTER_API_KEY")
+		TWITTER_API_SECRET    = os.Getenv("TWITTER_API_SECRET")
+		TWITTER_ACCESS_TOKEN  = os.Getenv("TWITTER_ACCESS_TOKEN")
+		TWITTER_ACCESS_SECRET = os.Getenv("TWITTER_ACCESS_SECRET")
+	)
+	twitter := trends.NewTwitter(TWITTER_API_KEY, TWITTER_API_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_SECRET)
+	usecase := usecase.NewUseCase(twitter)
+	application := basic.NewApplication(usecase)
+	application.Run(8080)
 }
 
 func rss(c echo.Context) error {
