@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -19,7 +20,7 @@ const GOOGLE_NEWS_RSS_URL = "https://news.google.com/rss/search"
 
 func init() {
 	if err := godotenv.Load(); err != nil {
-		panic(fmt.Errorf("failed to load .env file: %w", err))
+		log.Println("[WARN] failed to load .env file: %w", err)
 	}
 }
 
